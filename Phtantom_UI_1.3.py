@@ -40,6 +40,7 @@ def request_sensor_data():
     while ser.in_waiting <= 0:
         time.sleep(0.1)
     data = ser.readline().decode().strip()
+    print(f"Received sensor data: {data}")  # Debugging print
     return data 
 
 def update_conditions(conditions):
@@ -65,9 +66,9 @@ def update_conditions(conditions):
 
 def collect_and_send_conditions():
     inputs = {
-        "Enter servo PV position (10-100%)": None,  # Note the change in prompt
+        "Enter servo PV position (10-100%)": None,
         "Enter servo CR1 position (0-100%)": None,
-        "Enter servo CR2 position (10-100%)": None,  # Note the change in prompt
+        "Enter servo CR2 position (10-100%)": None,
         "Enter left pump rate (L/min)": None,
         "Enter right pump rate (L/min)": None,
         "Enter fluid temperature in Celsius": None
@@ -108,8 +109,14 @@ def collect_and_send_conditions():
     return servo1, servo2, servo3, pump_rate_left, pump_rate_right, fluid_temp
 
 def format_table(conditions, sensor_data=",,,,,"):
-    # Formats conditions and sensor data into a table format. If sensor_data is not provided, leaves blanks.
-    flow1, flow2, flow3, pressure1, pressure2, pressure3 = sensor_data.split(',')
+    try:
+        # Attempt to split and unpack the sensor data
+        flow1, flow2, flow3, pressure1, pressure2, pressure3 = sensor_data.split(',')
+    except ValueError:
+        # Handle cases where sensor data is not as expected
+        flow1 = flow2 = flow3 = pressure1 = pressure2 = pressure3 = "N/A"
+        print("Warning: Received incomplete sensor data.")
+
     servo1, servo2, servo3, pump_rate_left, pump_rate_right, fluid_temp = conditions
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     output = (
@@ -134,17 +141,13 @@ def format_table(conditions, sensor_data=",,,,,"):
     return output
 
 def beta_run(conditions):
-
     update_conditions(conditions)
-
     # Generate and print the table with current conditions
     output = format_table((int(conditions[0]), int(conditions[1]), int(conditions[2]), float(conditions[3]), float(conditions[4]), float(conditions[5])), '-,-,-,-,-,-')
     print(output)
-
     # Define the beta output filename
     script_dir = os.path.dirname(os.path.realpath(__file__))
     beta_filename = os.path.join(script_dir, datetime.now().strftime("Beta Output - %Y-%m-%d - %Hh%Mm%Ss.txt"))
-
     # Log the output to the beta-specific file
     with open(beta_filename, "a") as file:
         file.write(output + "\n")
@@ -152,16 +155,12 @@ def beta_run(conditions):
 def main():
     # Setup initial conditions
     conditions = collect_and_send_conditions()
-
-    # initialize the positions of the servo motors
+    # Initialize the positions of the servo motors
     update_conditions(conditions)
-
     # Get the directory of the current script
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    
     # Filename for storing the output, ensuring it's created in the same folder as the script
     filename = os.path.join(script_dir, datetime.now().strftime("Output - %Y-%m-%d - %Hh%Mm%Ss.txt"))
-    
     while True:
         print("\n1. Get sensor readings")
         print("2. Update inputted conditions")
@@ -170,7 +169,6 @@ def main():
         print()
         user_choice = input("What would you like to do? ")
         print()
-
         if user_choice == '1':
             # Request sensor data and print it
             sensor_data = request_sensor_data()
@@ -206,3 +204,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
