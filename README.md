@@ -37,17 +37,17 @@ Fig 3. Arduino set up for flow sensor testing
 
 3.	Devices for future studies
 
-For the originally used Grove Based Shield, the Arduino PIN numbers, and grove connector numbers are shown in the figure 4 below. 
+For the originally used Grove Based Shield, the Arduino PIN numbers, and grove connector numbers are shown in the figure 4 below (source: https://techexplorations.com/guides/arduino/grove/baseshield/).  
 
 <img width="415" alt="zzzzz" src="https://github.com/user-attachments/assets/ebe4c675-4862-4a99-87bc-eb7842c09a67">
-Fig 4. The interface of 
 
-For the originally used Grove Based Shield, the Arduino PIN numbers, and grove connector numbers are shown in the figure 4 below.
+Fig 4. Clarification of PIN on grove base shield
+
+The black wire connects to GND, red wire connects to VCC, white wire connects to NC (for a grove module), and yellow wire connect to SIG. The missing reading of flow sensors that previously used grove base might due to the missing yellow wire. 
 
 <img width="336" alt="image" src="https://github.com/user-attachments/assets/0c76a786-43a2-4f2f-9b7d-967823f2691e">
 
 Fig 5. The interface of grove base shield
-In figure 5, the interface of grove base shield  
- 
-Fig x. The detailed 
+
+As shown in fig 5, the red circled ports are digital ports. Among these, port 3, 5, and 6 are multi-purpose and can function as PWM output. 
 
